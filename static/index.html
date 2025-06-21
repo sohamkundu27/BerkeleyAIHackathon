@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Transcription</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            padding: 20px 40px;
+            font-size: 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 200px;
+        }
+        
+        .btn-record {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-record:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        .btn-stop {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            box-shadow: 0 4px 15px rgba(44, 62, 80, 0.4);
+        }
+        
+        .btn-stop:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(44, 62, 80, 0.6);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .recording-indicator {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .recording-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        .transcription-area {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 200px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .transcription-text {
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #f39c12;
+        }
+        
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .recording-time {
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Voice Transcription</h1>
+        
+        <div class="controls">
+            <button id="recordBtn" class="btn btn-record">Start Recording</button>
+        </div>
+        
+        <div class="status" id="status">Click the button to begin recording</div>
+        
+        <div class="recording-indicator" id="recordingIndicator">
+            <span class="recording-dot"></span>
+            Recording in progress...
+        </div>
+        
+        <div class="recording-time" id="recordingTime"></div>
+        
+        <div class="transcription-area">
+            <div id="transcriptionText" class="transcription-text placeholder">
+                Your transcribed text will appear here...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const recordBtn = document.getElementById('recordBtn');
+        const status = document.getElementById('status');
+        const recordingIndicator = document.getElementById('recordingIndicator');
+        const transcriptionText = document.getElementById('transcriptionText');
+        const recordingTime = document.getElementById('recordingTime');
+        
+        let recordingStartTime = null;
+        let recordingTimer = null;
+        let isRecording = false;
+
+        recordBtn.addEventListener('click', toggleRecording);
+
+        async function toggleRecording() {
+            if (!isRecording) {
+                await startRecording();
+            } else {
+                await stopRecording();
+            }
+        }
+
+        async function startRecording() {
+            try {
+                // Update UI
+                recordBtn.disabled = true;
+                status.textContent = 'Starting recording...';
+                recordingIndicator.style.display = 'block';
+                transcriptionText.innerHTML = '<div class="loading">Ready to record...</div>';
+                
+                // Send start recording request
+                const response = await fetch('/start_recording', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    isRecording = true;
+                    recordBtn.textContent = 'Stop Recording';
+                    recordBtn.className = 'btn btn-stop';
+                    status.textContent = 'Recording... Click the button again to stop';
+                    recordingStartTime = Date.now();
+                    startRecordingTimer();
+                    recordBtn.disabled = false;
+                } else {
+                    throw new Error('Failed to start recording');
+                }
+                
+            } catch (error) {
+                console.error('Error starting recording:', error);
+                transcriptionText.innerHTML = '<div class="error">Error starting recording. Please try again.</div>';
+                status.textContent = 'Error occurred';
+                resetUI();
+            }
+        }
+
+        async function stopRecording() {
+            try {
+                // Update UI
+                recordBtn.disabled = true;
+                status.textContent = 'Stopping recording...';
+                transcriptionText.innerHTML = '<div class="loading">Processing audio...</div>';
+                stopRecordingTimer();
+                
+                // Send stop recording request
+                const response = await fetch('/stop_recording', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    transcriptionText.textContent = result.transcription || 'No transcription available';
+                    status.textContent = 'Transcription complete!';
+                } else {
+                    throw new Error('Failed to stop recording');
+                }
+                
+            } catch (error) {
+                console.error('Error stopping recording:', error);
+                transcriptionText.innerHTML = '<div class="error">Error processing audio. Please try again.</div>';
+                status.textContent = 'Error occurred';
+            } finally {
+                resetUI();
+            }
+        }
+
+        function startRecordingTimer() {
+            recordingTimer = setInterval(() => {
+                if (recordingStartTime) {
+                    const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+                    const minutes = Math.floor(elapsed / 60);
+                    const seconds = elapsed % 60;
+                    recordingTime.textContent = `Recording time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        function stopRecordingTimer() {
+            if (recordingTimer) {
+                clearInterval(recordingTimer);
+                recordingTimer = null;
+            }
+            recordingTime.textContent = '';
+            recordingStartTime = null;
+        }
+
+        function resetUI() {
+            isRecording = false;
+            recordBtn.textContent = 'Start Recording';
+            recordBtn.className = 'btn btn-record';
+            recordBtn.disabled = false;
+            recordingIndicator.style.display = 'none';
+            stopRecordingTimer();
+        }
+    </script>
+</body>
+</html> 
