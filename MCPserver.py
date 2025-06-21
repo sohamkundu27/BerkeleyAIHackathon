@@ -17,6 +17,7 @@ data = [{
     },
     ]
 
+
 # MCP request structure
 class MCPRequest(BaseModel):
     tool: str
