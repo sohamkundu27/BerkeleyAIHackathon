@@ -7,6 +7,7 @@ client = anthropic.Anthropic(
 
 def get_response(prompt):
     # 1. Analyzer pipeline
+    # Data will be imported from the robotics environment
     # We will feed in data that looks like this:
     # data = [{
     # Object: "scissors"
