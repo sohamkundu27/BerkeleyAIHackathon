@@ -6,8 +6,16 @@ from typing import Dict, Any
 # the methods will have code that will directly control the robot arm
 
 app = FastAPI()
-
-
+# hardcoded data to begin with, will change
+data = [{
+    "Object": "scissors",
+    "location": [2,5,1]
+    },
+    {
+    "Object": "hammer",
+    "location":  [1,2,3] #coordinates
+    },
+    ]
 
 
 # MCP request structure
