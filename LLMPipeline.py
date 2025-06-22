@@ -6,12 +6,12 @@ client = anthropic.Anthropic(
 )
 # list_of_objects = []
 data = [{
-    "Object": "cube",
-    "location": [0.85, -0.2, 0.65]
+    "Object": "cube1",
+    "location": [8, 2, 6]
 },
     {
-    "Object": "cube",
-    "location": [0.7, 0.0, 0.65]
+    "Object": "cube2",
+    "location": [2, 3, 6]
 },
 ]
 
@@ -47,8 +47,50 @@ def get_response(data, prompt):
             }
         ]
     )
-    print(message.content)
+    analysis = message.content
+    message = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=20000,
+        temperature=1,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""
+                    You are in a 3D world. You are a robot arm mounted on a table. You can control the end effector's position and gripper.
 
+                    original data: {data}
+                    task: {prompt}
+                    analysis: {analysis}
+                    you need to return a list in this exact format. return nothing list just this
+                    ["tool", {{"target": [0.85, -0.2, 1.2]}}
+                    "move_arm", {{"target": [0.85, -0.2, 1.2]}}
+                    "move_arm", {{"target": [0.85, -0.2, 1.2]}}]
+                """
+            }
+        ]
+    )
+    print(message.content)
+    
+    # Extract text from TextBlock if it's a list
+    if isinstance(message.content, list) and len(message.content) > 0:
+        # Get the text from the first TextBlock
+        response_text = message.content[0].text
+        print(f"Extracted text: {response_text}")
+        
+        # Convert the string representation to a Python list
+        import ast
+        try:
+            result_list = ast.literal_eval(response_text)
+            print(f"Parsed list: {result_list}")
+            return result_list
+        except Exception as e:
+            print(f"Error parsing list: {e}")
+            return None
+    else:
+        print("No TextBlock found in response")
+        return None
+
+    get_response(data, prompt)
     # # 1. Analyzer
     # message = client.messages.create(
     #     model="claude-sonnet-4-20250514",
