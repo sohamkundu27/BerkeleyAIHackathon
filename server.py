@@ -4,9 +4,10 @@
 #   uv \
 #   run \
 #   server.py
-# Lastly click on the url with the authenticaiton key already on there 
+# Lastly click on the url with the authenticaiton key already on there
 
 from mcp.server.fastmcp import FastMCP
+from simulation import move_arm, open_gripper, close_gripper
 
 # Create an MCP server
 mcp = FastMCP("Demo")
@@ -23,17 +24,23 @@ def add(a: int, b: int) -> int:
 def move_arm(target, target_orn=None):
     # set_arm(target_pos=target, target_orn=target_orn)
     return
-     
+
+
 @mcp.tool()
 def open_gripper():
     # set_gripper(closed=False)
     return
-     
+
+
 @mcp.tool()
 def close_gripper():
-    # set_gripper(closed=True)
-    return
-     
+    try:
+        close_gripper()
+        return "Gripper closed successfully"
+    except Exception as e:
+        return f"Error closing gripper: {str(e)}"
+
+
 # Add a dynamic greeting resource
 @mcp.resource("greeting://{name}")
 def get_greeting(name: str) -> str:
@@ -41,7 +48,5 @@ def get_greeting(name: str) -> str:
     return f"Hello, {name}!"
 
 
-
 if __name__ == '__main__':
-    mcp.run(transport = 'stdio')
-    
+    mcp.run(transport='stdio')
