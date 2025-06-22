@@ -2,6 +2,7 @@ import math
 import numpy as np
 import pybullet_data
 import pybullet as p
+import time
 
 
 class RobotSim:
@@ -83,6 +84,8 @@ class RobotSim:
                     targetPosition=interp_poses[j]
                 )
 
+            if t % 8 == 0:
+                time.sleep(0.05)
             p.stepSimulation()
 
     def open_gripper(self):
@@ -99,6 +102,8 @@ class RobotSim:
             p.setJointMotorControl2(
                 self.kuka_gripper_id, 6, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
 
+            if t % 8 == 0:
+                time.sleep(0.05)
             p.stepSimulation()
 
     def close_gripper(self):
@@ -115,4 +120,6 @@ class RobotSim:
             p.setJointMotorControl2(
                 self.kuka_gripper_id, 6, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
 
+            if t % 8 == 0:
+                time.sleep(0.05)
             p.stepSimulation()

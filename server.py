@@ -37,7 +37,7 @@ def open_gripper():
 
 @mcp.tool()
 def close_gripper():
-    sim.ckose_gripper()
+    sim.close_gripper()
     return "Gripper closed"
 
 
