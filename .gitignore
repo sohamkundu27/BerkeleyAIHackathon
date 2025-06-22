@@ -91,4 +91,4 @@ mcp-config.json
 local_settings.py
 scratch.py
 test_*.py
-debug_*
+debug_*.venv/
