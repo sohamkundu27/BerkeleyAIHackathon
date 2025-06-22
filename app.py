@@ -11,16 +11,31 @@ import threading
 import time
 from datetime import datetime
 from LLMPipeline import get_response
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+import asyncio
 
+async def run_mcp_plan(tool_plan: list):
+    server_params = StdioServerParameters(command="python", args=["server.py"])
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+
+            for tool_call in tool_plan:
+                tool = tool_call["tool"]
+                args = tool_call.get("args", {})
+                result = await session.call_tool(tool, args)
+                print(f"✅ Ran {tool}: {result.content[0].text if result.content else 'No output'}")
 data = [{
-    "Object": "scissors",
-    "location": [2,5,1]
-    },
-    {
-    "Object": "hammer",
-    "location":  [1,2,3] #coordinates
-    },
-    ]
+    "Object": "cube1",
+    "location": [0.85, -0.2, 0.65]
+},
+{
+    "Object": "cube2",
+    "location": [0.7, 0.0, 0.65]
+},
+]
 # Suppress the FP16 warning
 warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
 
@@ -198,9 +213,10 @@ def transcribe_upload():
         # Transcribe the uploaded file
         transcription = transcribe_uploaded_file(audio_file)
         
-        log_message(f"📤 Sending transcription response: '{transcription}'")        
-        get_response(data, transcription)
-        
+        log_message(f"📤 Sending transcription response: '{transcription}'") 
+        plan = get_response(data, transcription)
+        print(f"THIS IS THE PLAN{plan}")
+        asyncio.run(run_mcp_plan(plan))
         return jsonify({'transcription': transcription})
         
     except Exception as e:

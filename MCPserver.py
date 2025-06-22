@@ -10,11 +10,14 @@ app = FastAPI()
 
 # hardcoded data to begin with, will change
 data = [{
-    "Object": "cube",
-    "location": [0.85, -0.2, 0.65]
-},
-]
-
+    "Object": "scissors",
+    "location": [2,5,1]
+    },
+    {
+    "Object": "hammer",
+    "location":  [1,2,3] #coordinates
+    },
+    ]
 
 # MCP request structure
 class MCPRequest(BaseModel):

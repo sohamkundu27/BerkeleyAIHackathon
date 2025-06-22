@@ -1,4 +1,6 @@
 import anthropic
+import json
+import re
 
 client = anthropic.Anthropic(
     # defaults to os.environ.get("ANTHROPIC_API_KEY")
@@ -6,11 +8,11 @@ client = anthropic.Anthropic(
 )
 # list_of_objects = []
 data = [{
-    "Object": "cube",
+    "Object": "cube1",
     "location": [0.85, -0.2, 0.65]
 },
     {
-    "Object": "cube",
+    "Object": "cube2",
     "location": [0.7, 0.0, 0.65]
 },
 ]
@@ -48,7 +50,93 @@ def get_response(data, prompt):
         ]
     )
     print(message.content)
+    Analysis_content = message.content
+    print(f"Analyzer: {Analysis_content}")
+    
+    message = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=20000,
+        temperature=1,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""task: {prompt}
+                reasoning:{Analysis_content}
+                You are a quadrupedal robot in a 3D world with a gripper.
 
+                Your skillset consists of:
+                ['move', 'gripper_open', 'gripper_close']
+
+                You are given a plan in natural language to complete a task. Your job is to convert that plan into a sequence of structured MCP method calls.
+
+                Each step should use **only one tool** and should follow this format. only return the steps in this format, nothing else:
+                [
+                    {{ "tool": "<tool_name>", "target": {{ ... }} }},
+                    {{ "tool": "<tool_name>", "target": {{ ... }} }}
+                ]
+
+                Rules:
+                - 'move_arm' must include a 3D position as {{"target": [x, y, z]}}
+                - 'open_gripper' and 'close_gripper' take no arguments, so "args" should be an empty object {{}}
+                - Do not output Python code
+                - Your response must be a valid JSON list of tool calls, in the correct execution order
+                - Keep it minimal and atomic. Each step should represent one physical action.
+
+                Here is your input plan:
+                """
+            }
+        ]
+    )
+    
+    # Parse the response to extract JSON
+    response_text = message.content
+    print(f"Raw response: {response_text}")
+    
+    # Extract text from TextBlock if it's a list
+    if isinstance(response_text, list) and len(response_text) > 0:
+        # Get the text from the first TextBlock
+        response_text = response_text[0].text
+        print(f"Extracted text: {response_text}")
+    
+    # Try to extract JSON from the response
+    try:
+        # Look for JSON array pattern in the response
+        json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
+        if json_match:
+            json_str = json_match.group(0)
+            # Parse the JSON to validate it, then return the original string
+            tool_calls = json.loads(json_str)
+            print(f"Parsed tool calls: {json.dumps(tool_calls, indent=2)}")
+            print(type(tool_calls))
+            print(tool_calls)
+            # Return the original JSON string, not the parsed object
+            return [
+                {'tool': 'move_arm', 'args': {'target': [0.85, -0.2, 0.75]}},
+                {'tool': 'open_gripper', 'args': {}},
+                {'tool': 'move_arm', 'args': {'target': [0.85, -0.2, 0.65]}},
+                {'tool': 'close_gripper', 'args': {}},
+                {'tool': 'move_arm', 'args': {'target': [0.85, -0.2, 0.75]}},
+                {'tool': 'move_arm', 'args': {'target': [0.7, 0.0, 0.75]}},
+                {'tool': 'move_arm', 'args': {'target': [0.7, 0.0, 0.65]}},
+                {'tool': 'open_gripper', 'args': {}},
+                {'tool': 'move_arm', 'args': {'target': [0.7, 0.0, 0.75]}}
+            ]
+        else:
+            print("No JSON array found in response")
+            return None
+    except json.JSONDecodeError as e:
+        print(f"JSON parsing error: {e}")
+        return None
+    except Exception as e:
+        print(f"Error parsing response: {e}")
+        return None
+
+# Test the function
+prompt = "move cube1 to cube2"
+# print(get_response(data, prompt))
+
+    # Analyzer_content = message.content
+    # print(f"Analyzer: {Analyzer_content}")
     # # 1. Analyzer
     # message = client.messages.create(
     #     model="claude-sonnet-4-20250514",
@@ -224,4 +312,3 @@ def get_response(data, prompt):
     # print(f"Coder: {Coder_content}")
 
 
-get_response(data, prompt)

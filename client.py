@@ -26,6 +26,7 @@ async def test_add_function():
 
                 # Test the add function
                 print("\n🧮 Testing add function...")
+
                 result = await session.call_tool("add", {"a": 15, "b": 27})
                 print(f"Result of 15 + 27 = {result.content[0].text}")
 
