@@ -7,10 +7,13 @@
 # Lastly click on the url with the authenticaiton key already on there
 
 from mcp.server.fastmcp import FastMCP
-from simulation import move_arm, open_gripper, close_gripper
+from robot_controller import RobotSim
+import os
+os.environ["DISPLAY"] = ":0"
 
 # Create an MCP server
 mcp = FastMCP("Demo")
+sim = RobotSim()
 
 
 # Add an addition tool
@@ -22,23 +25,20 @@ def add(a: int, b: int) -> int:
 
 @mcp.tool()
 def move_arm(target, target_orn=None):
-    # set_arm(target_pos=target, target_orn=target_orn)
-    return
+    sim.move_arm(target, target_orn)
+    return f"Arm moved to {target} with orientation {target_orn}"
 
 
 @mcp.tool()
 def open_gripper():
-    # set_gripper(closed=False)
-    return
+    sim.open_gripper()
+    return "Gripper opened"
 
 
 @mcp.tool()
 def close_gripper():
-    try:
-        close_gripper()
-        return "Gripper closed successfully"
-    except Exception as e:
-        return f"Error closing gripper: {str(e)}"
+    sim.ckose_gripper()
+    return "Gripper closed"
 
 
 # Add a dynamic greeting resource

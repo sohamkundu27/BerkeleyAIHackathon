@@ -26,12 +26,17 @@ async def test_add_function():
 
                 # Test the add function
                 print("\n🧮 Testing add function...")
-                result = await session.call_tool("add", {"a": 15, "b": 27})
-                print(f"Result of 15 + 27 = {result.content[0].text}")
+                result = await session.call_tool("add", {"a": 100, "b": 50})
+                print(f"Result of 100 + 50 = {result.content[0].text}")
 
-                # Test with different numbers
-                result2 = await session.call_tool("add", {"a": 100, "b": 50})
-                print(f"Result of 100 + 50 = {result2.content[0].text}")
+                result = await session.call_tool("move_arm", {"target": [0.5, 0.5, 0.5]})
+                print(f"Result of move_arm: {result.content[0].text}")
+
+                await session.call_tool("open_gripper")
+                await session.call_tool("close_gripper")
+                await session.call_tool("open_gripper")
+                await session.call_tool("close_gripper")
+
 
                 print("\n✨ All tests completed successfully!")
 
