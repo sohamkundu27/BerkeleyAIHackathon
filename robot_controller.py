@@ -93,6 +93,14 @@ class RobotSim:
         self.num_joints = p.getNumJoints(self.kuka_id)
         self.kuka_end_effector_idx = 6
 
+        # Reset camera view
+        p.resetDebugVisualizerCamera(
+            cameraDistance=2.2,
+            cameraYaw=223,
+            cameraPitch=-38,
+            cameraTargetPosition=[1, -0.5, 0.0]
+        )
+
     def move_arm(self, target_pos, target_orn=None):
         target_pos[2] += 0.25
         steps = 1000
@@ -156,3 +164,10 @@ class RobotSim:
                 self.kuka_gripper_id, 6, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
 
             p.stepSimulation()
+
+
+if __name__ == "__main__":
+    sim = RobotSim()
+    while True:
+        p.stepSimulation()
+        time.sleep(1. / 240.)  # match PyBullet's default timestep
