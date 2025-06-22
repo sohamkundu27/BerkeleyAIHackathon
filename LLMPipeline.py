@@ -7,7 +7,7 @@ client = anthropic.Anthropic(
 # list_of_objects = []
 data = [{
     "Object": "apple",
-    "location": [0.8, -0.3, 0.6849899910813102]
+    "location": [0.82, -0.3, 0.6849899910813102]
 },
     {
     "Object": "bottle",
@@ -23,7 +23,7 @@ data = [{
 },
     {
     "Object": "container",
-    "location": [0.9, -0.75, 0.73]
+    "location": [0.85, -1, 0.7]
 },
     {
     "Object": "hammer",

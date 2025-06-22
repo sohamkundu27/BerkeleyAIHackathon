@@ -29,13 +29,8 @@ class RobotSim:
                          spinningFriction=0.1, rollingFriction=0.01)
 
         apple_pos = [0.8, -0.3, 0.6849899910813102]
-        apple_id = p.loadURDF(objectspath + "apple.urdf",
-                              basePosition=apple_pos, globalScaling=0.04)
-        # Friction on the apple
-        p.changeDynamics(apple_id, -1,
-                         lateralFriction=1.2,
-                         spinningFriction=0.08,
-                         rollingFriction=0.2)
+        p.loadURDF(objectspath + "apple.urdf",
+                   basePosition=apple_pos, globalScaling=0.03)
 
         bottle_pos = [0.7, 0.1, 0.8]
         bottle_id = p.loadURDF(objectspath + "bottle.urdf",
@@ -131,7 +126,7 @@ class RobotSim:
             p.stepSimulation()
 
     def open_gripper(self):
-        steps = 600
+        steps = 500
         current_pos = p.getJointState(self.kuka_gripper_id, 4)[
             0]
 
@@ -147,7 +142,7 @@ class RobotSim:
             p.stepSimulation()
 
     def close_gripper(self):
-        steps = 600
+        steps = 500
         current_pos = p.getJointState(self.kuka_gripper_id, 4)[
             0]
 
