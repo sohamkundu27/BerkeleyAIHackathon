@@ -47,8 +47,32 @@ def get_response(data, prompt):
             }
         ]
     )
-    print(message.content)
+    analysis = message.content
+    message = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=20000,
+        temperature=1,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""
+                    You are in a 3D world. You are a robot arm mounted on a table. You can control the end effector's position and gripper.
 
+                    original data: {data}
+                    task: {prompt}
+                    analysis: {analysis}
+                    you need to return a list in this exact format. return nothing list just this
+                    ["tool", {{"target": [0.85, -0.2, 1.2]}}
+                    "move_arm", {{"target": [0.85, -0.2, 1.2]}}
+                    "move_arm", {{"target": [0.85, -0.2, 1.2]}}]
+                """
+            }
+        ]
+    )
+    print(message.content)
+    return message.content
+
+    get_response(data, prompt)
     # # 1. Analyzer
     # message = client.messages.create(
     #     model="claude-sonnet-4-20250514",
