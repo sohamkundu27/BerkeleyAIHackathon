@@ -17,7 +17,7 @@ from mcp.client.stdio import stdio_client
 
 data = [{
     "Object": "apple",
-    "location": [0.8, -0.3, 0.6849899910813102],
+    "location": [0.82, -0.3, 0.6849899910813102],
     "x": "short",
     "y": "short"
 },
@@ -41,7 +41,7 @@ data = [{
 },
     {
     "Object": "container",
-    "location": [0.9, -0.75, 0.73],
+    "location": [0.85, -1, 0.7],
     "x": "long",
     "y": "long"
 },

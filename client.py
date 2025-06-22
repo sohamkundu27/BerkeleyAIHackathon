@@ -27,13 +27,13 @@ async def test_add_function():
 
                 # Test the add function
                 print("\n🧮 Testing add function...")
-                apple_pos = [0.8, -0.3, 0.6849899910813102]
+                apple_pos = [0.82, -0.3, 0.6849899910813102]
                 bottle_pos = [0.7, 0.1, 0.8]
                 box_pos = [1, 0.1, 0.7]
                 banana_pos = [0.893, 0.313, 0.660]
-                container_pos = [0.85, -0.6, 0.7]  # assuming you have this
+                container_pos = [0.85, -1, 0.7]
 
-                for obj_pos in [banana_pos, bottle_pos, apple_pos, box_pos]:
+                for obj_pos in [box_pos]:
                     orn = [0, math.pi, math.pi / 2]
                     dist_above = 0.3
 
@@ -53,7 +53,7 @@ async def test_add_function():
                     print(f"lift object: {result.content[0].text}")
 
                     above_container = container_pos.copy()
-                    above_container[2] += 0.2
+                    above_container[2] += 0.3
 
                     result = await session.call_tool("move_arm", {"target": above_container})
                     print(f"move to container: {result.content[0].text}")
