@@ -18,19 +18,22 @@ def add(a: int, b: int) -> int:
     """Add two numbers"""
     return a + b
 
-# Expose functions
+
 @mcp.tool()
 def move_arm(target, target_orn=None):
     # set_arm(target_pos=target, target_orn=target_orn)
-    return 
+    return
+     
 @mcp.tool()
 def open_gripper():
     # set_gripper(closed=False)
-    return 
+    return
+     
 @mcp.tool()
 def close_gripper():
     # set_gripper(closed=True)
-    return 
+    return
+     
 # Add a dynamic greeting resource
 @mcp.resource("greeting://{name}")
 def get_greeting(name: str) -> str:

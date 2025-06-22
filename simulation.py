@@ -2,12 +2,12 @@ import math
 import numpy as np
 import pybullet as p
 import pybullet_data
-# import imageio_ffmpeg
-# from base64 import b64encode
-# from IPython.display import HTML
+import imageio_ffmpeg
+from base64 import b64encode
+from IPython.display import HTML
 
 
-p.connect(p.GUI)  # or p.GUI for graphical version
+p.connect(p.DIRECT)  # or p.GUI for graphical version
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
 p.setGravity(0, 0, -10)
 
@@ -63,33 +63,33 @@ cam_up, cam_up_axis_idx, cam_near_plane, cam_far_plane, cam_fov = [
     0, 0, 1], 2, 0.01, 100, 60
 
 # video = cv2.VideoWriter('vid.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (cam_width, cam_height)) # Does not seem to support h264!
-# vid = imageio_ffmpeg.write_frames('vid.mp4', (cam_width, cam_height), fps=30)
-# vid.send(None)  # seed the video writer with a blank frame
+vid = imageio_ffmpeg.write_frames('vid.mp4', (cam_width, cam_height), fps=30)
+vid.send(None)  # seed the video writer with a blank frame
 
 # video
 
 
-# def capture_frame(t):
-#     if t % 8 == 0:
-#         view_matrix = p.computeViewMatrixFromYawPitchRoll(
-#             cam_target_pos, cam_distance, cam_yaw, cam_pitch, cam_roll, cam_up_axis_idx
-#         )
-#         proj_matrix = p.computeProjectionMatrixFOV(
-#             cam_fov, cam_width / cam_height, cam_near_plane, cam_far_plane
-#         )
+def capture_frame(t):
+    if t % 8 == 0:
+        view_matrix = p.computeViewMatrixFromYawPitchRoll(
+            cam_target_pos, cam_distance, cam_yaw, cam_pitch, cam_roll, cam_up_axis_idx
+        )
+        proj_matrix = p.computeProjectionMatrixFOV(
+            cam_fov, cam_width / cam_height, cam_near_plane, cam_far_plane
+        )
 
-#         # Use TINY_RENDERER for reliability in p.DIRECT or headless mode
-#         width, height, rgb_pixels, *_ = p.getCameraImage(
-#             cam_width, cam_height, view_matrix, proj_matrix,
-#             renderer=p.ER_TINY_RENDERER
-#         )
+        # Use TINY_RENDERER for reliability in p.DIRECT or headless mode
+        width, height, rgb_pixels, *_ = p.getCameraImage(
+            cam_width, cam_height, view_matrix, proj_matrix,
+            renderer=p.ER_TINY_RENDERER
+        )
 
-#         # Reshape to (H, W, 4), force dtype, slice RGB
-#         image = np.array(rgb_pixels, dtype=np.uint8).reshape(
-#             (height, width, 4))[:, :, :3]
+        # Reshape to (H, W, 4), force dtype, slice RGB
+        image = np.array(rgb_pixels, dtype=np.uint8).reshape(
+            (height, width, 4))[:, :, :3]
 
-#         Write frame to video
-#         vid.send(np.ascontiguousarray(image))
+        # Write frame to video
+        vid.send(np.ascontiguousarray(image))
 
 
 # Expose functions
@@ -122,8 +122,8 @@ def move_arm(target_pos, target_orn=None):
                 targetPosition=interp_poses[j]
             )
 
-        # if t % 8 == 0:
-        #     capture_frame(t)
+        if t % 8 == 0:
+            capture_frame(t)
         p.stepSimulation()
 
 
@@ -141,8 +141,8 @@ def open_gripper():
         p.setJointMotorControl2(
             kuka_gripper_id, 6, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
 
-        # if t % 8 == 0:
-        #     capture_frame(t)
+        if t % 8 == 0:
+            capture_frame(t)
         p.stepSimulation()
 
 
@@ -160,8 +160,8 @@ def close_gripper():
         p.setJointMotorControl2(
             kuka_gripper_id, 6, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
 
-        # if t % 8 == 0:
-        #     capture_frame(t)
+        if t % 8 == 0:
+            capture_frame(t)
         p.stepSimulation()
 
 
@@ -184,11 +184,11 @@ open_gripper()
 move_arm([0.85, -0.2, 1.2])
 
 
-# vid.close()
+vid.close()
 p.disconnect()
 
 # Play recorded video
 # os.system(f"ffmpeg -y -i vid.avi -vcodec libx264 vidc.mp4") # convert to mp4 to show in browser
-# mp4 = open('vid.mp4', 'rb').read()
-# data_url = "data:video/mp4;base64," + b64encode(mp4).decode()
-# HTML('<video width=480 controls><source src="%s" type="video/mp4"></video>' % data_url)
+mp4 = open('vid.mp4', 'rb').read()
+data_url = "data:video/mp4;base64," + b64encode(mp4).decode()
+HTML('<video width=480 controls><source src="%s" type="video/mp4"></video>' % data_url)
