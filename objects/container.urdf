@@ -1,0 +1,227 @@
+<?xml version="1.0"?>
+<robot name="container">
+  <!-- Base/Bottom -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="8.0 6.0 0.3"/>
+      </geometry>
+      <origin xyz="0 0 -1.35" rpy="0 0 0"/>  <!-- Changed from 0.15 to -1.35 (shifted down by 1.5) -->
+      <material name="brown">
+        <color rgba="0.6 0.4 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="8.0 6.0 0.3"/>
+      </geometry>
+      <origin xyz="0 0 -1.35" rpy="0 0 0"/>  <!-- Changed from 0.15 to -1.35 -->
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <origin xyz="0 0 -1.35"/>  <!-- Changed from 0.15 to -1.35 -->
+      <inertia 
+        ixx="1.504" ixy="0.0" ixz="0.0"
+        iyy="2.671" iyz="0.0"
+        izz="4.175"/>
+    </inertial>
+  </link>
+
+  <!-- Front wall -->
+  <link name="front_wall">
+    <visual>
+      <geometry>
+        <box size="8.0 0.2 3.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Changed from 1.5 to 0 (shifted down by 1.5) -->
+      <material name="brown">
+        <color rgba="0.6 0.4 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="8.0 0.2 3.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+    </collision>
+    <inertial>
+      <mass value="0.3"/>
+      <origin xyz="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+      <inertia 
+        ixx="0.228" ixy="0.0" ixz="0.0"
+        iyy="1.828" iyz="0.0"
+        izz="1.603"/>
+    </inertial>
+  </link>
+
+  <!-- Back wall -->
+  <link name="back_wall">
+    <visual>
+      <geometry>
+        <box size="8.0 0.2 3.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+      <material name="brown">
+        <color rgba="0.6 0.4 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="8.0 0.2 3.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+    </collision>
+    <inertial>
+      <mass value="0.3"/>
+      <origin xyz="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+      <inertia 
+        ixx="0.228" ixy="0.0" ixz="0.0"
+        iyy="1.828" iyz="0.0"
+        izz="1.603"/>
+    </inertial>
+  </link>
+
+  <!-- Left wall -->
+  <link name="left_wall">
+    <visual>
+      <geometry>
+        <box size="0.2 5.6 3.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+      <material name="brown">
+        <color rgba="0.6 0.4 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.2 5.6 3.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+    </collision>
+    <inertial>
+      <mass value="0.25"/>
+      <origin xyz="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+      <inertia 
+        ixx="0.844" ixy="0.0" ixz="0.0"
+        iyy="0.189" iyz="0.0"
+        izz="0.655"/>
+    </inertial>
+  </link>
+
+  <!-- Right wall -->
+  <link name="right_wall">
+    <visual>
+      <geometry>
+        <box size="0.2 5.6 3.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+      <material name="brown">
+        <color rgba="0.6 0.4 0.2 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.2 5.6 3.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+    </collision>
+    <inertial>
+      <mass value="0.25"/>
+      <origin xyz="0 0 0"/>  <!-- Changed from 1.5 to 0 -->
+      <inertia 
+        ixx="0.844" ixy="0.0" ixz="0.0"
+        iyy="0.189" iyz="0.0"
+        izz="0.655"/>
+    </inertial>
+  </link>
+
+  <!-- Joints to connect walls -->
+  <joint name="base_to_front" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_wall"/>
+    <origin xyz="0 2.9 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="base_to_back" type="fixed">
+    <parent link="base_link"/>
+    <child link="back_wall"/>
+    <origin xyz="0 -2.9 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="base_to_left" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_wall"/>
+    <origin xyz="-3.9 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="base_to_right" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_wall"/>
+    <origin xyz="3.9 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Optional: Handles on the sides -->
+  <link name="handle_left">
+    <visual>
+      <geometry>
+        <box size="0.5 0.3 1.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="metal">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.5 0.3 1.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <origin xyz="0 0 0"/>
+      <inertia 
+        ixx="0.004" ixy="0.0" ixz="0.0"
+        iyy="0.004" iyz="0.0"
+        izz="0.001"/>
+    </inertial>
+  </link>
+
+  <link name="handle_right">
+    <visual>
+      <geometry>
+        <box size="0.5 0.3 1.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="metal">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.5 0.3 1.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <origin xyz="0 0 0"/>
+      <inertia 
+        ixx="0.004" ixy="0.0" ixz="0.0"
+        iyy="0.004" iyz="0.0"
+        izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="left_wall_to_handle" type="fixed">
+    <parent link="left_wall"/>
+    <child link="handle_left"/>
+    <origin xyz="-0.35 0 0.5" rpy="0 0 0"/>  <!-- Changed from 2.0 to 0.5 (shifted down by 1.5) -->
+  </joint>
+
+  <joint name="right_wall_to_handle" type="fixed">
+    <parent link="right_wall"/>
+    <child link="handle_right"/>
+    <origin xyz="0.35 0 0.5" rpy="0 0 0"/>  <!-- Changed from 2.0 to 0.5 (shifted down by 1.5) -->
+  </joint>
+</robot>

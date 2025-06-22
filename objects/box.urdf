@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<robot name="box">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="4.0 1.0 3.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Changed from "0 0 1.5" -->
+      <material name="box_yellow">
+        <color rgba="1.0 0.8 0.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="4.0 1.0 3.0"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>  <!-- Changed from "0 0 1.5" -->
+    </collision>
+    <inertial>
+      <mass value="0.3"/>
+      <origin xyz="0 0 0"/>  <!-- Changed from "0 0 1.5" -->
+      <inertia 
+        ixx="0.275" ixy="0.0" ixz="0.0"
+        iyy="0.625" iyz="0.0"
+        izz="0.425"/>
+    </inertial>
+  </link>
+  
+  <!-- Label -->
+  <link name="label">
+    <visual>
+      <geometry>
+        <box size="3.8 0.05 2.5"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="label_green">
+        <color rgba="0.0 0.8 0.2 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0"/>
+      <inertia 
+        ixx="0.0001" ixy="0.0" ixz="0.0"
+        iyy="0.0001" iyz="0.0"
+        izz="0.0001"/>
+    </inertial>
+  </link>
+  
+  <joint name="box_to_label" type="fixed">
+    <parent link="base_link"/>
+    <child link="label"/>
+    <origin xyz="0 0.525 0" rpy="0 0 0"/>  <!-- Changed from "0 0.525 1.5" -->
+  </joint>
+</robot>
