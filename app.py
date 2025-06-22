@@ -16,14 +16,30 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 data = [{
-    "Object": "scissors",
-    "location": [2,5,1]
-    },
+    "Object": "apple",
+    "location": [0.8, -0.3, 0.6849899910813102]
+},
+    {
+    "Object": "bottle",
+    "location": [0.7, 0.1, 0.8]
+},
+    {
+    "Object": "box",
+    "location": [1, 0.1, 0.7]
+},
+    {
+    "Object": "banana",
+    "location": [0.893, 0.313, 0.660]
+},
+    {
+    "Object": "container",
+    "location": [0.9, -0.75, 0.73]
+},
     {
     "Object": "hammer",
-    "location":  [1,2,3] #coordinates
-    },
-    ]
+    "location": [1, -0.2, 0.7]
+},
+]
 # Suppress the FP16 warning
 warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
 
