@@ -17,28 +17,40 @@ from mcp.client.stdio import stdio_client
 
 data = [{
     "Object": "apple",
-    "location": [0.8, -0.3, 0.6849899910813102]
+    "location": [0.8, -0.3, 0.6849899910813102],
+    "x": "short",
+    "y": "short"
 },
     {
     "Object": "bottle",
-    "location": [0.7, 0.1, 0.8]
+    "location": [0.7, 0.1, 0.8],
+    "x": "short",
+    "y": "short"
 },
     {
     "Object": "box",
-    "location": [1, 0.1, 0.7]
+    "location": [1, 0.1, 0.7],
+    "x": "long",
+    "y": "short"
 },
     {
     "Object": "banana",
-    "location": [0.893, 0.313, 0.660]
+    "location": [0.893, 0.313, 0.660],
+    "x": "long",
+    "y": "short"
 },
     {
     "Object": "container",
-    "location": [0.9, -0.75, 0.73]
+    "location": [0.9, -0.75, 0.73],
+    "x": "long",
+    "y": "long"
 },
     {
     "Object": "hammer",
-    "location": [1, -0.2, 0.7]
-},
+    "location": [1, -0.2, 0.7],
+    "x": "short",
+    "y": "long"
+}
 ]
 # Suppress the FP16 warning
 warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")

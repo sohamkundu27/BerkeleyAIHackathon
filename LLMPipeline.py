@@ -7,28 +7,40 @@ client = anthropic.Anthropic(
 # list_of_objects = []
 data = [{
     "Object": "apple",
-    "location": [0.8, -0.3, 0.6849899910813102]
+    "location": [0.8, -0.3, 0.6849899910813102],
+    "x": "short",
+    "y": "short"
 },
     {
     "Object": "bottle",
-    "location": [0.7, 0.1, 0.8]
+    "location": [0.7, 0.1, 0.8],
+    "x": "short",
+    "y": "short"
 },
     {
     "Object": "box",
-    "location": [1, 0.1, 0.7]
+    "location": [1, 0.1, 0.7],
+    "x": "long",
+    "y": "short"
 },
     {
     "Object": "banana",
-    "location": [0.893, 0.313, 0.660]
+    "location": [0.893, 0.313, 0.660],
+    "x": "long",
+    "y": "short"
 },
     {
     "Object": "container",
-    "location": [0.9, -0.75, 0.73]
+    "location": [0.9, -0.75, 0.73],
+    "x": "long",
+    "y": "long"
 },
     {
     "Object": "hammer",
-    "location": [1, -0.2, 0.7]
-},
+    "location": [1, -0.2, 0.7],
+    "x": "short",
+    "y": "long"
+}
 ]
 
 
@@ -57,7 +69,9 @@ def get_response(data, prompt):
                 - open_gripper()
                 - close_gripper()
 
-                You must output a sequence of functions to complete the task.
+                You must output a sequence of functions to complete the task. Go up 0.3m each time you pick up an object. Prior to routing to an object, move to a position 0.25m above it. Drop objects into the container from 0.25m above the container.
+                Immediately before descending on each object, decide between the [0, math.pi, math.pi / 2] target_orn (y direction is short) or the [0, math.pi, 0] target_orn (x direction is short).
+                The table's height is 0.626m. The opposite corners of its rectangular surface have the following (x, y) coordinates in meters: (0.43, -0.95) and (1.5, 0.55).
                 """
             }
         ]
@@ -79,8 +93,8 @@ def get_response(data, prompt):
                     analysis: {analysis}
                     you need to return a list in this exact format. return nothing list just this
                     ["tool", {{"target": [0.85, -0.2, 1.2]}}
-                    "move_arm", {{"target": [0.85, -0.2, 1.2]}}
-                    "move_arm", {{"target": [0.85, -0.2, 1.2]}}]
+                    "move_arm", {{"target": [0.85, -0.2, 1.2], "target_orn": [0, math.pi, math.pi / 2]}}
+                    "move_arm", {{"target": [0.85, -0.2, 1.2], "target_orn": [0, math.pi, 0]}}]
                 """
             }
         ]
