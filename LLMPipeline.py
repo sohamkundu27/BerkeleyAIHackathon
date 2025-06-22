@@ -66,8 +66,9 @@ def get_response(data, prompt):
                 - open_gripper()
                 - close_gripper()
 
-                You must output a sequence of functions to complete the task. Go up 0.3m each time you pick up an object. Prior to routing to an object, move to a position 0.25m above it. Drop objects into the container from 0.25m above the container.
-                Immediately before descending on each object, decide between the [0, math.pi, math.pi / 2] target_orn (y direction is short) or the [0, math.pi, 0] target_orn (x direction is short).
+                You must output a sequence of functions to complete the task. Go up 0.3m each time you pick up an object. Prior to routing to an object, move to a position 0.25m above it. Drop objects into the container from 0.3m above the container.
+                Try your best to avoid other objects without adding too many steps to the task.
+                Before descending on each object, decide between the [0, math.pi, math.pi / 2] target_orn (y direction is short) or the [0, math.pi, 0] target_orn (x direction is short). Move to the chosen orientation while hovering above each object, NOT while moving down towards the object.
                 The table's height is 0.626m. The opposite corners of its rectangular surface have the following (x, y) coordinates in meters: (0.43, -0.95) and (1.5, 0.55).
                 """
             }
