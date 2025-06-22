@@ -1,9 +1,6 @@
 Start the mobile app with-
 npx expo start
 
-Start Flask server with-
-python app.py
-
 Pipeline-
 speak into phone
 receive text input in flask

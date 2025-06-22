@@ -10,8 +10,17 @@ import warnings
 import threading
 import time
 from datetime import datetime
-from LLMPipeline import 
+from LLMPipeline import get_response
 
+data = [{
+    "Object": "scissors",
+    "location": [2,5,1]
+    },
+    {
+    "Object": "hammer",
+    "location":  [1,2,3] #coordinates
+    },
+    ]
 # Suppress the FP16 warning
 warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
 
@@ -157,7 +166,8 @@ def stop_recording():
         log_message(f"📊 Total audio chunks recorded: {len(audio_chunks)}")
         
         # Transcribe the recorded audio
-        transcription = transcribe_audio(audio_chunks)
+        transcription = transcribe_audio(audio_chunks)                
+
         log_message(f"📝 Final transcription: '{transcription}'")
         return jsonify({'transcription': transcription})
         
@@ -188,7 +198,9 @@ def transcribe_upload():
         # Transcribe the uploaded file
         transcription = transcribe_uploaded_file(audio_file)
         
-        log_message(f"📤 Sending transcription response: '{transcription}'")
+        log_message(f"📤 Sending transcription response: '{transcription}'")        
+        get_response(data, transcription)
+        
         return jsonify({'transcription': transcription})
         
     except Exception as e:
@@ -224,7 +236,6 @@ def receive_transcript():
             'transcript': transcript_chunk,
             'is_final': is_final
         }
-        
         log_message(f"✅ Sending acknowledgment for chunk {chunk_id}")
         return jsonify(response)
         
