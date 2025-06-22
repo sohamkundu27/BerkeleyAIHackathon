@@ -1,18 +1,13 @@
-import os
-import time
 import math
 import numpy as np
-from PIL import Image
-import matplotlib.pyplot as plt
 import pybullet as p
 import pybullet_data
-import cv2
-import imageio_ffmpeg
-from base64 import b64encode
-from IPython.display import HTML
+# import imageio_ffmpeg
+# from base64 import b64encode
+# from IPython.display import HTML
 
 
-p.connect(p.DIRECT)  # or p.GUI for graphical version
+p.connect(p.GUI)  # or p.GUI for graphical version
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
 p.setGravity(0, 0, -10)
 
@@ -61,43 +56,45 @@ kuka_end_effector_idx = 6
 # camera parameters
 cam_target_pos = [.95, -0.2, 0.2]
 cam_distance = 2.05
-cam_yaw, cam_pitch, cam_roll = -50, -40, 0
+cam_yaw, cam_pitch, cam_roll = -60, -40, 0
 cam_width, cam_height = 480, 360
 
 cam_up, cam_up_axis_idx, cam_near_plane, cam_far_plane, cam_fov = [
     0, 0, 1], 2, 0.01, 100, 60
 
 # video = cv2.VideoWriter('vid.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (cam_width, cam_height)) # Does not seem to support h264!
-vid = imageio_ffmpeg.write_frames('vid.mp4', (cam_width, cam_height), fps=30)
-vid.send(None)  # seed the video writer with a blank frame
+# vid = imageio_ffmpeg.write_frames('vid.mp4', (cam_width, cam_height), fps=30)
+# vid.send(None)  # seed the video writer with a blank frame
 
 # video
 
 
-def capture_frame(t):
-    if t % 8 == 0:
-        view_matrix = p.computeViewMatrixFromYawPitchRoll(
-            cam_target_pos, cam_distance, cam_yaw, cam_pitch, cam_roll, cam_up_axis_idx
-        )
-        proj_matrix = p.computeProjectionMatrixFOV(
-            cam_fov, cam_width / cam_height, cam_near_plane, cam_far_plane
-        )
+# def capture_frame(t):
+#     if t % 8 == 0:
+#         view_matrix = p.computeViewMatrixFromYawPitchRoll(
+#             cam_target_pos, cam_distance, cam_yaw, cam_pitch, cam_roll, cam_up_axis_idx
+#         )
+#         proj_matrix = p.computeProjectionMatrixFOV(
+#             cam_fov, cam_width / cam_height, cam_near_plane, cam_far_plane
+#         )
 
-        # Use TINY_RENDERER for reliability in p.DIRECT or headless mode
-        width, height, rgb_pixels, *_ = p.getCameraImage(
-            cam_width, cam_height, view_matrix, proj_matrix,
-            renderer=p.ER_TINY_RENDERER
-        )
+#         # Use TINY_RENDERER for reliability in p.DIRECT or headless mode
+#         width, height, rgb_pixels, *_ = p.getCameraImage(
+#             cam_width, cam_height, view_matrix, proj_matrix,
+#             renderer=p.ER_TINY_RENDERER
+#         )
 
-        # Reshape to (H, W, 4), force dtype, slice RGB
-        image = np.array(rgb_pixels, dtype=np.uint8).reshape(
-            (height, width, 4))[:, :, :3]
+#         # Reshape to (H, W, 4), force dtype, slice RGB
+#         image = np.array(rgb_pixels, dtype=np.uint8).reshape(
+#             (height, width, 4))[:, :, :3]
 
-        # Write frame to video
-        vid.send(np.ascontiguousarray(image))
+#         Write frame to video
+#         vid.send(np.ascontiguousarray(image))
 
 
-def set_arm(target_pos, steps=100, target_orn=None):
+# Expose functions
+def move_arm(target_pos, target_orn=None):
+    steps = 100
     if target_orn is None:
         target_orn = p.getQuaternionFromEuler([0, math.pi, 0])
     elif isinstance(target_orn, list) and len(target_orn) == 3:
@@ -125,41 +122,47 @@ def set_arm(target_pos, steps=100, target_orn=None):
                 targetPosition=interp_poses[j]
             )
 
-        if t % 8 == 0:
-            capture_frame(t)
+        # if t % 8 == 0:
+        #     capture_frame(t)
         p.stepSimulation()
 
 
-def set_gripper(closed, steps=100):
-    target_pos = 0.05 if closed else 0.0
+def open_gripper():
+    steps = 100
     current_pos = p.getJointState(kuka_gripper_id, 4)[
-        0]  # assume symmetrical gripper
+        0]
 
     for t in range(steps):
         frac = t / steps
-        interp_pos = (1 - frac) * current_pos + frac * target_pos
+        interp_pos = (1 - frac) * current_pos + frac * 0.0
 
         p.setJointMotorControl2(
             kuka_gripper_id, 4, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
         p.setJointMotorControl2(
             kuka_gripper_id, 6, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
 
-        if t % 8 == 0:
-            capture_frame(t)
+        # if t % 8 == 0:
+        #     capture_frame(t)
         p.stepSimulation()
 
 
-# Expose functions
-def move_arm(target, target_orn=None):
-    set_arm(target_pos=target, target_orn=target_orn)
-
-
-def open_gripper():
-    set_gripper(closed=False)
-
-
 def close_gripper():
-    set_gripper(closed=True)
+    steps = 100
+    current_pos = p.getJointState(kuka_gripper_id, 4)[
+        0]
+
+    for t in range(steps):
+        frac = t / steps
+        interp_pos = (1 - frac) * current_pos + frac * 0.05
+
+        p.setJointMotorControl2(
+            kuka_gripper_id, 4, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
+        p.setJointMotorControl2(
+            kuka_gripper_id, 6, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
+
+        # if t % 8 == 0:
+        #     capture_frame(t)
+        p.stepSimulation()
 
 
 # Example usage
@@ -181,11 +184,11 @@ open_gripper()
 move_arm([0.85, -0.2, 1.2])
 
 
-vid.close()
+# vid.close()
 p.disconnect()
 
 # Play recorded video
 # os.system(f"ffmpeg -y -i vid.avi -vcodec libx264 vidc.mp4") # convert to mp4 to show in browser
-mp4 = open('vid.mp4', 'rb').read()
-data_url = "data:video/mp4;base64," + b64encode(mp4).decode()
-HTML('<video width=480 controls><source src="%s" type="video/mp4"></video>' % data_url)
+# mp4 = open('vid.mp4', 'rb').read()
+# data_url = "data:video/mp4;base64," + b64encode(mp4).decode()
+# HTML('<video width=480 controls><source src="%s" type="video/mp4"></video>' % data_url)
