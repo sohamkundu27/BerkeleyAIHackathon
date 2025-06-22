@@ -1,4 +1,5 @@
 import anthropic
+import math
 
 client = anthropic.Anthropic(
     # defaults to os.environ.get("ANTHROPIC_API_KEY")
@@ -89,10 +90,15 @@ def get_response(data, prompt):
                     original data: {data}
                     task: {prompt}
                     analysis: {analysis}
-                    you need to return a list in this exact format. return nothing list just this
-                    ["tool", {{"target": [0.85, -0.2, 1.2]}}
-                    "move_arm", {{"target": [0.85, -0.2, 1.2], "target_orn": [0, math.pi, math.pi / 2]}}
-                    "move_arm", {{"target": [0.85, -0.2, 1.2], "target_orn": [0, math.pi, 0]}}]
+
+                    You must output a sequence of functions to complete the task. Prior to routing to an object, move to a position 0.25m above it. Go up 0.3m each time you pick up an object. Drop objects into the container from 0.3m above the container.
+                    Immediately before descending on each object, decide between the [0, math.pi, math.pi / 2] target_orn (y direction is short) or the [0, math.pi, 0] target_orn (x direction is short).
+
+                    you need to return a single list in this exact format. return nothing list just this. do not make a new list for every command.
+                    {["move_arm", {"target": [0.85, -0.2, 1.2], "target_orn": [0, math.pi, math.pi / 2]},
+                    "close_gripper", {},
+                    "move_arm", {"target": [0.85, -0.2, 1.2], "target_orn": [0, math.pi, 0]},
+                    "open_gripper", {}]}
                 """
             }
         ]
