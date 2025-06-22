@@ -4,8 +4,17 @@ client = anthropic.Anthropic(
     # defaults to os.environ.get("ANTHROPIC_API_KEY")
     api_key="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",
 )
-
-def get_response(prompt):
+list_of_objects = []
+data = [{
+    "Object": "scissors",
+    "location": [2,5,1]
+    },
+    {
+    "Object": "hammer",
+    "location":  [1,2,3] #coordinates
+    },
+    ]
+def get_response(data, prompt):
     # 1. Analyzer pipeline
     # Data will be imported from the robotics environment
     # We will feed in data that looks like this:
@@ -24,7 +33,7 @@ def get_response(prompt):
         messages=[
             {
                 "role": "user",
-                "content": """Answer template: <start of analysis> <end of analysis> <start of description> 
+                "content": f"""{prompt}Answer template: <start of analysis> <end of analysis> <start of description> 
                 <end of analysis> 
                 Remember: Think step by step and show the steps between <start of analysis> and <end of analysis>. 
                 Return the key feature and its value between <start of description> and <end of description>. 
@@ -37,6 +46,11 @@ def get_response(prompt):
     print(f"Analyzer: {Analyzer_content}")
 
     # 2. Planner pipeline
+    # Generate object list string
+    object_list_str = ""
+    for item in data:
+        object_list_str += f"{item['Object']}: {item['location']}\n"
+    
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=20000,
@@ -44,28 +58,13 @@ def get_response(prompt):
         messages=[
             {
                 "role": "user",
-                "content": """You must follow the following answer template:
- 
-                Given an object list [OBJECT1, OBJECT2, OBJECT3, OBJECT4, ...]
-                <start of analysis>
-                [OBJECT1]: ...
-                [OBJECT2]: ...
-                [OBJECT3]: ...
-                [OBJECT4]: ...
-                [OBJECT5]: ...
-                [OBJECT6]: ...
-                ...
-                The spatial relationship between [OBJECT1] and [OBJECT2]: ...
-                The spatial relationship between [OBJECT2] and [OBJECT3]: ... 
-                The spatial relationship between [OBJECT1] and [OBJECT3]: ... 
-                The spatial relationship between [OBJECT1] and [OBJECT4]: ... 
-                The spatial relationship ...
-                ...
-                [Abstract Plan]: ...
-                <end of analysis>
+                "content": f"""You must follow the following answer template:
+                {prompt}
+                {Analyzer_content}
+                object list: {object_list_str}
 
                 Rules for analysis:
-                * You must only choose [OBJECT] from the object list. 
+                * You must only choose objects from the object list. 
                 * You must show the physical properties of objects, their affordances, and their roles in completing the task.
                 * You must reason about the relative positions of the objects along each axis. You must describe the spatial relationship between each pair of objects in the object list first based on numerical positions along each x, y and z axis. For example, whether the objects are in contact, and whether one object is on top of another object etc.
 
@@ -84,8 +83,6 @@ def get_response(prompt):
                 * 'move_to_position': Move the gripper to a position. It uses the goal-conditioned policy. You can use it to move to a target position. Moreover, you can use it with proper tools for manipulation tasks. You cannot rotate the gripper. You can only translate the gripper.
                 * 'open_gripper': open the gripper before grasping an object.
                 * 'close_gripper': close the gripper to grasp an object.
-                * 'get_center': get the center position of an object.
-                * 'get_graspable_point': get the graspable point of an object.
 
                 Rules for detailed plan:
                 * You must plan according to the analysis.
@@ -127,8 +124,11 @@ def get_response(prompt):
         messages=[
             {
                 "role": "user",
-                "content": """This part is to calculate the 3D target positions.
-
+                "content": f"""This part is to calculate the 3D target positions.
+                original input: {prompt}
+                analysis of the situation: {Analyzer_content}
+                plan: {Planner_content}
+                object list: {object_list_str}
                 Common Rules:
                 * Calculate step by step and show the calculation process between <start of description> and <end of description>.
                 * Return the 3D position between <start of answer> and <end of answer>.
@@ -166,55 +166,37 @@ def get_response(prompt):
 
     # 4. Coder pipeline
     message = client.messages.create(
-        model="claude-opus-4-20250514",
+        model="claude-sonnet-4-20250514",
         max_tokens=20000,
         temperature=1,
         messages=[
             {
                 "role": "user",
-                "content": """You are a quadrupedal robot.
-                The robot has a skill set: ['walk_to_position', 'push_to_position', 'get_position', 'get_size'].
-                You have a description of the plan to finish a task. We want you to turn the plan into the corresponding program with following functions:
-                ```
-                def get_position(object_name):
-                return object_position
-                
-                ```
-                get_position returns the 3D position of the object's center. The center position is located in the middle of the object. 
-                ```
-                def get_size(object_name):
-                return object_size
-                ```
-                object_size is the physical properties for the object.
-                ```
-                def walk_to_position(target_position):
-                ```
-                ```
-                def push_to_position(object_name, target_object_position):
-                ```
-                object_name is the name of the object to push.
-                target_object_position is the final target position of the object.
+                "content": """
+                You are a quadrupedal robot in a 3D world with a gripper.
 
-                Example answer code:
-                ```
-                # python
-                import numpy as np  # import numpy because we are using it below
+                Your skillset consists of:
+                ['move', 'gripper_open', 'gripper_close']
 
-                # Always get a position of an object with the 'get_position' function before trying to move to an object.
-                box_position = get_position('box')
-                ```
+                You are given a plan in natural language to complete a task. Your job is to convert that plan into a sequence of structured MCP method calls.
+
+                Each step should use **only one tool** and should follow this format:
+                { "tool": "<tool_name>", "args": { ... } }
 
                 Rules:
-                * Always format the code in code blocks.
-                * You must not leave unimplemented code blocks in your response.
-                * You must not leave undefined variables in your response.
-                * The only allowed library is numpy. Do not import or use any other library. If you use np, be sure to import numpy.
-                * If you are not sure what value to use, just use your best judge. Do not use None for anything.
-                * Do not define new functions, and only use existing functions.
+                - 'move' must include a 3D position as {"target": [x, y, z]}
+                - 'gripper_open' and 'gripper_close' take no arguments, so "args" should be an empty object {}
+                - Do not output Python code
+                - Your response must be a valid JSON list of tool calls, in the correct execution order
+                - Keep it minimal and atomic. Each step should represent one physical action.
 
-                In the following, I provide you the description and you respond with the code."""
+                Here is your input plan:
+                <PLAN>
+                """
             }
         ]
     )
     Coder_content = message.content
     print(f"Coder: {Coder_content}")
+
+get_response(data, "move the hammer to the scissors")
