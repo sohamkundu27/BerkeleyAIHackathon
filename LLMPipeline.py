@@ -172,7 +172,7 @@ def get_response(data, prompt):
         messages=[
             {
                 "role": "user",
-                "content": """
+                "content": f"""
                 You are a quadrupedal robot in a 3D world with a gripper.
 
                 Your skillset consists of:
@@ -181,17 +181,17 @@ def get_response(data, prompt):
                 You are given a plan in natural language to complete a task. Your job is to convert that plan into a sequence of structured MCP method calls.
 
                 Each step should use **only one tool** and should follow this format:
-                { "tool": "<tool_name>", "args": { ... } }
+                {{ "tool": "<tool_name>", "args": {{ ... }} }}
 
                 Rules:
-                - 'move' must include a 3D position as {"target": [x, y, z]}
-                - 'gripper_open' and 'gripper_close' take no arguments, so "args" should be an empty object {}
+                - 'move' must include a 3D position as {{"target": [x, y, z]}}
+                - 'gripper_open' and 'gripper_close' take no arguments, so "args" should be an empty object {{}}
                 - Do not output Python code
                 - Your response must be a valid JSON list of tool calls, in the correct execution order
                 - Keep it minimal and atomic. Each step should represent one physical action.
 
                 Here is your input plan:
-                <PLAN>
+                {Planner_content}
                 """
             }
         ]
