@@ -4,12 +4,10 @@ client = anthropic.Anthropic(
     # defaults to os.environ.get("ANTHROPIC_API_KEY")
     api_key="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",
 )
-# list_of_objects = []
 data = [{
     "Object": "apple",
-    "location": [0.8, -0.3, 0.6849899910813102],
     "x": "short",
-    "y": "short"
+    "y": "short",
     "location": [0.82, -0.3, 0.6849899910813102]
 },
     {
@@ -41,9 +39,7 @@ data = [{
     "location": [1, -0.2, 0.7],
     "x": "short",
     "y": "long"
-}
-]
-
+}]
 
 
 def get_response(data, prompt):
@@ -101,13 +97,13 @@ def get_response(data, prompt):
         ]
     )
     print(message.content)
-    
+
     # Extract text from TextBlock if it's a list
     if isinstance(message.content, list) and len(message.content) > 0:
         # Get the text from the first TextBlock
         response_text = message.content[0].text
         print(f"Extracted text: {response_text}")
-        
+
         # Convert the string representation to a Python list
         import ast
         try:
@@ -130,11 +126,11 @@ def get_response(data, prompt):
     #     messages=[
     #         {
     #             "role": "user",
-    #             "content": f"""{prompt}Answer template: <start of analysis> <end of analysis> <start of description> 
-    #             <end of analysis> 
-    #             Remember: Think step by step and show the steps between <start of analysis> and <end of analysis>. 
-    #             Return the key feature and its value between <start of description> and <end of description>. 
-    #             The key features are the 3D spatial information that are not directly included in the [Scene Description] but needs further calculation. 
+    #             "content": f"""{prompt}Answer template: <start of analysis> <end of analysis> <start of description>
+    #             <end of analysis>
+    #             Remember: Think step by step and show the steps between <start of analysis> and <end of analysis>.
+    #             Return the key feature and its value between <start of description> and <end of description>.
+    #             The key features are the 3D spatial information that are not directly included in the [Scene Description] but needs further calculation.
     #             In the following, I will provide you the task description."""
     #         }
     #     ]
@@ -297,4 +293,4 @@ def get_response(data, prompt):
     # print(f"Coder: {Coder_content}")
 
 
-#get_response(data, prompt)
+# get_response(data, prompt)
