@@ -9,8 +9,11 @@ import io
 import warnings
 import threading
 import time
+import asyncio
 from datetime import datetime
 from LLMPipeline import get_response
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
 
 data = [{
     "Object": "scissors",
@@ -199,7 +202,14 @@ def transcribe_upload():
         transcription = transcribe_uploaded_file(audio_file)
         
         log_message(f"📤 Sending transcription response: '{transcription}'")        
-        get_response(data, transcription)
+        plan = get_response(data, transcription)
+        
+        if plan:
+            log_message(f"🤖 Executing robot plan: {plan}")
+            # Execute the MCP plan
+            asyncio.run(execute_mcp_plan(plan))
+        else:
+            log_message("⚠️ No plan generated from transcription")
         
         return jsonify({'transcription': transcription})
         
@@ -242,6 +252,32 @@ def receive_transcript():
     except Exception as e:
         log_message(f"❌ Error in receive_transcript: {e}")
         return jsonify({'error': 'Failed to process transcript chunk'}), 500
+
+async def execute_mcp_plan(tool_plan: list):
+    """Execute a list of MCP tool calls"""
+    server_params = StdioServerParameters(command="python", args=["server.py"])
+    
+    try:
+        async with stdio_client(server_params) as (read, write):
+            async with ClientSession(read, write) as session:
+                await session.initialize()
+                log_message("✅ Connected to MCP server")
+                
+                # Execute each tool call in the plan
+                for i in range(0, len(tool_plan), 2):
+                    if i + 1 < len(tool_plan):
+                        tool_name = tool_plan[i]
+                        tool_args = tool_plan[i + 1]
+                        
+                        log_message(f"🔧 Executing {tool_name} with args: {tool_args}")
+                        result = await session.call_tool(tool_name, tool_args)
+                        log_message(f"✅ {tool_name} completed: {result.content[0].text if result.content else 'No output'}")
+                
+                log_message("🎉 All MCP tool calls completed successfully")
+                
+    except Exception as e:
+        log_message(f"❌ Error executing MCP plan: {e}")
+        raise e
 
 if __name__ == '__main__':
     # Create static folder if it doesn't exist
