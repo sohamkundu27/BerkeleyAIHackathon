@@ -100,7 +100,7 @@ class RobotSim:
 
     def move_arm(self, target_pos, target_orn=None):
         target_pos[2] += 0.25
-        steps = 150
+        steps = 1000
         if target_orn is None:
             target_orn = p.getQuaternionFromEuler([0, math.pi, 0])
         elif isinstance(target_orn, list) and len(target_orn) == 3:
@@ -128,12 +128,10 @@ class RobotSim:
                     targetPosition=interp_poses[j]
                 )
 
-            if t % 8 == 0:
-                time.sleep(0.05)
             p.stepSimulation()
 
     def open_gripper(self):
-        steps = 288
+        steps = 600
         current_pos = p.getJointState(self.kuka_gripper_id, 4)[
             0]
 
@@ -146,12 +144,10 @@ class RobotSim:
             p.setJointMotorControl2(
                 self.kuka_gripper_id, 6, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
 
-            if t % 8 == 0:
-                time.sleep(0.02)
             p.stepSimulation()
 
     def close_gripper(self):
-        steps = 288
+        steps = 600
         current_pos = p.getJointState(self.kuka_gripper_id, 4)[
             0]
 
@@ -164,6 +160,4 @@ class RobotSim:
             p.setJointMotorControl2(
                 self.kuka_gripper_id, 6, p.POSITION_CONTROL, targetPosition=interp_pos, force=100)
 
-            if t % 8 == 0:
-                time.sleep(0.02)
             p.stepSimulation()
