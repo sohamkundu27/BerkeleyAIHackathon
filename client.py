@@ -31,7 +31,7 @@ async def test_add_function():
                 bottle_pos = [0.7, 0.1, 0.8]
                 box_pos = [1, 0.1, 0.7]
                 banana_pos = [0.893, 0.313, 0.660]
-                container_pos = [0.85, -1, 0.7]
+                container_pos = [0.9, -0.75, 0.73]
 
                 for obj_pos in [box_pos]:
                     orn = [0, math.pi, math.pi / 2]
@@ -60,6 +60,9 @@ async def test_add_function():
 
                     result = await session.call_tool("open_gripper", {})
                     print(f"open_gripper: {result.content[0].text}")
+
+                    result = await session.call_tool("move_arm", {"target": above_container})
+                    print(f"move to container: {result.content[0].text}")
 
                     result = await session.call_tool("move_arm", {"target": [0.85, -0.2, 0.9], "target_orn": orn})
                     print(f"reset arm position: {result.content[0].text}")
