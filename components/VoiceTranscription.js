@@ -44,6 +44,9 @@ export default function VoiceTranscription() {
     try {
       setIsProcessing(true);
       
+      // Clear transcription when starting new recording
+      setTranscription('');
+      
       // Configure audio mode
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
@@ -175,8 +178,8 @@ export default function VoiceTranscription() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>🎤 Voice Transcription</Text>
-        <Text style={styles.subtitle}>Tap to record your voice</Text>
+        <Text style={styles.title}>🤖Robo-Arm Automation🦾</Text>
+        <Text style={styles.subtitle}>Tap to command your robot</Text>
       </View>
 
       <View style={styles.controls}>
@@ -211,11 +214,6 @@ export default function VoiceTranscription() {
       <View style={styles.transcriptionContainer}>
         <View style={styles.transcriptionHeader}>
           <Text style={styles.transcriptionTitle}>Transcription</Text>
-          {transcription ? (
-            <TouchableOpacity onPress={clearTranscription}>
-              <Text style={styles.clearButton}>Clear</Text>
-            </TouchableOpacity>
-          ) : null}
         </View>
         
         <ScrollView style={styles.transcriptionArea}>
@@ -308,11 +306,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
-  },
-  clearButton: {
-    color: '#ff6b6b',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   transcriptionArea: {
     flex: 1,

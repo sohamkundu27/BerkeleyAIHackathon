@@ -6,16 +6,31 @@ client = anthropic.Anthropic(
 )
 # list_of_objects = []
 data = [{
-    "Object": "cube1",
-    "location": [8, 2, 6]
+    "Object": "apple",
+    "location": [0.8, -0.3, 0.6849899910813102]
 },
     {
-    "Object": "cube2",
-    "location": [2, 3, 6]
+    "Object": "bottle",
+    "location": [0.7, 0.1, 0.8]
+},
+    {
+    "Object": "box",
+    "location": [1, 0.1, 0.7]
+},
+    {
+    "Object": "banana",
+    "location": [0.893, 0.313, 0.660]
+},
+    {
+    "Object": "container",
+    "location": [0.9, -0.75, 0.73]
+},
+    {
+    "Object": "hammer",
+    "location": [1, -0.2, 0.7]
 },
 ]
 
-prompt = "Stack the cubes on on top of the other"
 
 
 def get_response(data, prompt):
@@ -56,7 +71,8 @@ def get_response(data, prompt):
             {
                 "role": "user",
                 "content": f"""
-                    You are in a 3D world. You are a robot arm mounted on a table. You can control the end effector's position and gripper.
+                    You are in a 3D world. You are a robot arm mounted on a table. You can control the end effector's position and gripper. 
+                    If you move, choose coordinates of the objects we have provided.
 
                     original data: {data}
                     task: {prompt}
@@ -266,4 +282,4 @@ def get_response(data, prompt):
     # print(f"Coder: {Coder_content}")
 
 
-get_response(data, prompt)
+#get_response(data, prompt)
