@@ -89,7 +89,7 @@ def get_response(data, prompt):
                     original data: {data}
                     task: {prompt}
                     analysis: {analysis}
-                    you need to return a list in this exact format. return nothing list just this
+                    you need to return a single list in this exact format. return nothing list just this. do not make a new list for every command.
                     ["tool", {{"target": [0.85, -0.2, 1.2]}}
                     "move_arm", {{"target": [0.85, -0.2, 1.2], "target_orn": [0, math.pi, math.pi / 2]}}
                     "move_arm", {{"target": [0.85, -0.2, 1.2], "target_orn": [0, math.pi, 0]}}]

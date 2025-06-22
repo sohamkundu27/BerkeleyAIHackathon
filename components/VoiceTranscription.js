@@ -11,7 +11,7 @@ import {
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 
-const SERVER_URL = 'http://10.56.148.120:5001'; // Change this to your server IP
+const SERVER_URL = 'http://10.56.243.135:5001'; // Change this to your server IP
 
 export default function VoiceTranscription() {
   const [recording, setRecording] = useState(null);
