@@ -49,6 +49,10 @@ class RobotSim:
         banana_orn = [0.997, 0.000, 0.030, -0.073]
         banana_id = p.loadURDF(objectspath + "banana.urdf", basePosition=banana_pos,
                                baseOrientation=banana_orn, globalScaling=0.035)
+        p.changeDynamics(banana_id, -1,  # -1 applies to all links
+                         lateralFriction=0.5,      # Small amount of friction
+                         spinningFriction=0.02,    # Very light spinning friction
+                         rollingFriction=0.01)     # Very light rolling friction
 
         container_pos = [0.9, -0.75, 0.73]
         container_id = p.loadURDF(objectspath + "container.urdf",
@@ -103,7 +107,7 @@ class RobotSim:
 
     def move_arm(self, target_pos, target_orn=None):
         target_pos[2] += 0.25
-        steps = 1000
+        steps = 700
         if target_orn is None:
             target_orn = p.getQuaternionFromEuler([0, math.pi, 0])
         elif isinstance(target_orn, list) and len(target_orn) == 3:
@@ -134,7 +138,7 @@ class RobotSim:
             p.stepSimulation()
 
     def open_gripper(self):
-        steps = 500
+        steps = 100
         current_pos = p.getJointState(self.kuka_gripper_id, 4)[
             0]
 
@@ -150,7 +154,7 @@ class RobotSim:
             p.stepSimulation()
 
     def close_gripper(self):
-        steps = 500
+        steps = 100
         current_pos = p.getJointState(self.kuka_gripper_id, 4)[
             0]
 

@@ -3,12 +3,12 @@ import math
 
 client = anthropic.Anthropic(
     # defaults to os.environ.get("ANTHROPIC_API_KEY")
-    api_key="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",
+    api_key="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",
 )
 data = [{
     "Object": "apple",
     "x": "short",
-    "y": "short",
+    "y": "long",
     "location": [0.82, -0.3, 0.6849899910813102]
 },
     {
